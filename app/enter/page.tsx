@@ -33,11 +33,9 @@ export default function EnterPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
-            U
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">UFSCar ES 2026</h1>
-          <p className="text-gray-500 text-sm mt-1">Dashboard da turma</p>
+          <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-16 h-16 object-contain mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900">Educação Especial 2026</h1>
+          <p className="text-gray-500 text-sm mt-1">UFSCar · Dashboard da turma</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">

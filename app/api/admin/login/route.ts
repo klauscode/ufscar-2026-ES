@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error || !data.session) {
-    return NextResponse.json({ error: 'Credenciais inválidas.' }, { status: 401 })
+    console.error('Supabase login error:', error?.message)
+    return NextResponse.json({ error: error?.message ?? 'Credenciais inválidas.' }, { status: 401 })
   }
 
   const res = NextResponse.json({ ok: true })

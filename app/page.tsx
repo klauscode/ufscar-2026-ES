@@ -34,7 +34,7 @@ export default async function HomePage() {
           {today.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
         </p>
         <h1 className="text-3xl font-bold">Olá, Turma!</h1>
-        <p className="text-indigo-200 mt-1 text-sm">Engenharia de Software · UFSCar 2026</p>
+        <p className="text-indigo-200 mt-1 text-sm">Educação Especial · UFSCar 2026</p>
       </div>
 
       {/* Pinned news */}

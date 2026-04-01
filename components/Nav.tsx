@@ -21,10 +21,8 @@ export default function Nav() {
       <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-16">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 mr-6">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
-            U
-          </div>
-          <span className="font-bold text-gray-900 text-base hidden sm:block">UFSCar ES</span>
+          <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-8 h-8 object-contain" />
+          <span className="font-bold text-gray-900 text-base hidden sm:block">Educação Especial</span>
         </Link>
 
         {/* Nav links */}

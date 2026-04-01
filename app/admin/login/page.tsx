@@ -24,8 +24,8 @@ export default function AdminLoginPage() {
     if (res.ok) {
       router.push('/admin')
     } else {
-      const { error: msg } = await res.json()
-      setError(msg || 'Credenciais inválidas.')
+      const body = await res.json().catch(() => ({}))
+      setError(body.error || `Erro ${res.status} — tente novamente.`)
       setLoading(false)
     }
   }

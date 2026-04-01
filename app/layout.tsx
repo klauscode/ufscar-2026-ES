@@ -3,7 +3,7 @@ import './globals.css'
 import Nav from '@/components/Nav'
 
 export const metadata: Metadata = {
-  title: 'UFSCar ES 2026',
+  title: 'Educação Especial 2026 — UFSCar',
   description: 'Horários, tarefas e avisos da turma',
 }
 

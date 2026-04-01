@@ -26,7 +26,7 @@ export default function Nav() {
         WebkitBackdropFilter: 'blur(20px)',
       }}
     >
-      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-13">
+      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-14">
         <Link href="/" className="flex items-center gap-2.5 mr-5">
           <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-7 h-7 object-contain" />
           <span className="font-semibold text-sm hidden sm:block" style={{ color: 'var(--text)' }}>

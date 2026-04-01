@@ -8,6 +8,7 @@ const links = [
   { href: '/', label: 'Início' },
   { href: '/schedule', label: 'Horários' },
   { href: '/homework', label: 'Tarefas' },
+  { href: '/arquivos', label: 'Arquivos' },
   { href: '/news', label: 'Avisos' },
 ]
 

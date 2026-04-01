@@ -3,16 +3,16 @@ import './globals.css'
 import Nav from '@/components/Nav'
 
 export const metadata: Metadata = {
-  title: 'Dashboard da Turma',
+  title: 'UFSCar ES 2026',
   description: 'Horários, tarefas e avisos da turma',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-gray-50 text-gray-800 min-h-screen">
+      <body>
         <Nav />
-        <main className="max-w-5xl mx-auto px-4 py-8">{children}</main>
+        <main className="max-w-5xl mx-auto px-4 py-10">{children}</main>
       </body>
     </html>
   )

@@ -22,11 +22,11 @@ export default function Nav() {
       style={{
         background: 'var(--nav-bg)',
         borderColor: 'var(--border)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
       }}
     >
-      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-14">
+      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-13">
         <Link href="/" className="flex items-center gap-2.5 mr-5">
           <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-7 h-7 object-contain" />
           <span className="font-semibold text-sm hidden sm:block" style={{ color: 'var(--text)' }}>

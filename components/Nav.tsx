@@ -2,42 +2,49 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import ThemeToggle from './ThemeToggle'
 
 const links = [
   { href: '/', label: 'Início' },
   { href: '/schedule', label: 'Horários' },
   { href: '/homework', label: 'Tarefas' },
-  { href: '/todos', label: 'To-do' },
   { href: '/news', label: 'Avisos' },
 ]
 
 export default function Nav() {
   const pathname = usePathname()
-
   if (pathname === '/enter' || pathname === '/admin/login') return null
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50" style={{ boxShadow: '0 1px 12px rgba(0,0,0,0.06)' }}>
-      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 mr-6">
-          <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-8 h-8 object-contain" />
-          <span className="font-bold text-gray-900 text-base hidden sm:block">Educação Especial</span>
+    <nav
+      className="sticky top-0 z-50 border-b"
+      style={{
+        background: 'var(--nav-bg)',
+        borderColor: 'var(--border)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
+    >
+      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-14">
+        <Link href="/" className="flex items-center gap-2.5 mr-5">
+          <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-7 h-7 object-contain" />
+          <span className="font-semibold text-sm hidden sm:block" style={{ color: 'var(--text)' }}>
+            Ed. Especial <span style={{ color: 'var(--text-3)' }}>2026</span>
+          </span>
         </Link>
 
-        {/* Nav links */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {links.map(({ href, label }) => {
             const active = pathname === href
             return (
               <Link
                 key={href}
                 href={href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  active
-                    ? 'text-indigo-700 bg-indigo-50'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={{
+                  color: active ? 'var(--accent)' : 'var(--text-2)',
+                  background: active ? 'var(--accent-bg)' : 'transparent',
+                }}
               >
                 {label}
               </Link>
@@ -45,12 +52,14 @@ export default function Nav() {
           })}
         </div>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/admin"
-            className="text-xs text-gray-300 hover:text-gray-500 transition"
+            className="text-xs px-2.5 py-1 rounded-lg transition-all font-medium"
+            style={{ color: 'var(--text-3)', background: 'var(--surface-2)', border: '1px solid var(--border)' }}
           >
-            admin
+            Admin
           </Link>
         </div>
       </div>

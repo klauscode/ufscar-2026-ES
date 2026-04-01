@@ -1,36 +1,33 @@
 import { supabase } from '@/lib/supabase'
 
 export default async function NewsPage() {
-  const { data: news } = await supabase
-    .from('news').select('*')
+  const { data: news } = await supabase.from('news').select('*')
     .order('pinned', { ascending: false })
     .order('created_at', { ascending: false })
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Avisos</h1>
-        <p className="text-gray-500 text-sm mt-1">Comunicados da turma</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Avisos</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-2)' }}>Comunicados da turma</p>
       </div>
 
       {news && news.length > 0 ? (
         <ul className="space-y-4">
           {news.map((n: any) => (
-            <li key={n.id} className={`rounded-2xl border shadow-sm overflow-hidden ${n.pinned ? 'border-amber-200' : 'border-gray-100'}`}>
-              {n.pinned && <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-400" />}
-              <div className={`px-6 py-5 ${n.pinned ? 'bg-amber-50' : 'bg-white'}`}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    {n.pinned && (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 mb-2">
-                        📌 Fixado
-                      </span>
-                    )}
-                    <h2 className="font-semibold text-gray-900 text-base">{n.title}</h2>
-                    <p className="text-sm text-gray-600 mt-2 leading-relaxed whitespace-pre-wrap">{n.body}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-400 mt-4">
+            <li key={n.id} className="rounded-2xl border overflow-hidden" style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow)' }}>
+              {n.pinned && (
+                <div className="h-0.5" style={{ background: 'linear-gradient(90deg, #f59e0b, #f97316)' }} />
+              )}
+              <div className="px-6 py-5">
+                {n.pinned && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold mb-2 px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#d97706' }}>
+                    📌 Fixado
+                  </span>
+                )}
+                <h2 className="font-semibold text-base" style={{ color: 'var(--text)' }}>{n.title}</h2>
+                <p className="text-sm mt-2 leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-2)' }}>{n.body}</p>
+                <p className="text-xs mt-4" style={{ color: 'var(--text-3)' }}>
                   {new Date(n.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </p>
               </div>
@@ -38,9 +35,9 @@ export default async function NewsPage() {
           ))}
         </ul>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-12 text-center">
-          <p className="text-3xl mb-2">📭</p>
-          <p className="font-semibold text-gray-700">Nenhum aviso no momento.</p>
+        <div className="rounded-2xl border px-6 py-14 text-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <p className="text-4xl mb-3">📭</p>
+          <p className="font-semibold" style={{ color: 'var(--text)' }}>Nenhum aviso no momento.</p>
         </div>
       )}
     </div>

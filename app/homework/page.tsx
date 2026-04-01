@@ -1,43 +1,44 @@
 import { supabase } from '@/lib/supabase'
 
-function urgencyInfo(deadline: string) {
-  const days = (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-  if (days < 1) return { label: 'Hoje!', bar: 'bg-red-500', badge: 'bg-red-50 text-red-600 border-red-200' }
-  if (days < 3) return { label: `${Math.ceil(days)} dias`, bar: 'bg-orange-400', badge: 'bg-orange-50 text-orange-600 border-orange-200' }
-  return { label: `${Math.ceil(days)} dias`, bar: 'bg-indigo-400', badge: 'bg-indigo-50 text-indigo-600 border-indigo-200' }
+function urgency(deadline: string) {
+  const d = (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  if (d < 1) return { bar: '#ef4444', badge: 'bg-red-100 text-red-600', label: 'Hoje!' }
+  if (d < 3) return { bar: '#f97316', badge: 'bg-orange-100 text-orange-600', label: `${Math.ceil(d)} dias` }
+  return { bar: '#4f46e5', badge: '', label: `${Math.ceil(d)} dias` }
 }
 
 export default async function HomeworkPage() {
   const { data: homework } = await supabase.from('homework').select('*').order('deadline')
-  const upcoming = homework?.filter((hw: any) => new Date(hw.deadline) >= new Date()) ?? []
-  const past = homework?.filter((hw: any) => new Date(hw.deadline) < new Date()) ?? []
+  const upcoming = homework?.filter((h: any) => new Date(h.deadline) >= new Date()) ?? []
+  const past = homework?.filter((h: any) => new Date(h.deadline) < new Date()) ?? []
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Tarefas</h1>
-        <p className="text-gray-500 text-sm mt-1">{upcoming.length} pendente{upcoming.length !== 1 ? 's' : ''}</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Tarefas</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-2)' }}>
+          {upcoming.length > 0 ? `${upcoming.length} pendente${upcoming.length !== 1 ? 's' : ''}` : 'Tudo em dia!'}
+        </p>
       </div>
 
-      <section className="space-y-3">
+      <div className="space-y-3">
         {upcoming.length > 0 ? upcoming.map((hw: any) => {
-          const { label, bar, badge } = urgencyInfo(hw.deadline)
+          const { bar, badge, label } = urgency(hw.deadline)
           return (
-            <div key={hw.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className={`h-1 ${bar}`} />
+            <div key={hw.id} className="rounded-2xl border overflow-hidden" style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow)' }}>
+              <div className="h-0.5" style={{ background: bar }} />
               <div className="px-6 py-4 flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-800">{hw.title}</p>
-                  <p className="text-xs font-medium text-indigo-500 mt-0.5">{hw.subject}</p>
-                  {hw.description && (
-                    <p className="text-sm text-gray-500 mt-2 leading-relaxed">{hw.description}</p>
-                  )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold" style={{ color: 'var(--text)' }}>{hw.title}</p>
+                  <p className="text-xs font-medium mt-1" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
+                  {hw.description && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-2)' }}>{hw.description}</p>}
                 </div>
                 <div className="text-right shrink-0">
-                  <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full border ${badge}`}>
+                  <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${badge || 'text-xs font-semibold px-2.5 py-1 rounded-full'}`}
+                    style={!badge ? { background: 'var(--surface-2)', color: 'var(--text-2)' } : {}}>
                     {label}
                   </span>
-                  <p className="text-xs text-gray-400 mt-1.5">
+                  <p className="text-xs mt-1.5" style={{ color: 'var(--text-3)' }}>
                     {new Date(hw.deadline).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </p>
                 </div>
@@ -45,31 +46,29 @@ export default async function HomeworkPage() {
             </div>
           )
         }) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-12 text-center">
-            <p className="text-3xl mb-2">🎉</p>
-            <p className="font-semibold text-gray-700">Sem tarefas pendentes!</p>
-            <p className="text-sm text-gray-400 mt-1">Aproveite enquanto dura.</p>
+          <div className="rounded-2xl border px-6 py-14 text-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+            <p className="text-4xl mb-3">🎉</p>
+            <p className="font-semibold" style={{ color: 'var(--text)' }}>Sem tarefas pendentes!</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-3)' }}>Aproveite enquanto dura.</p>
           </div>
         )}
-      </section>
+      </div>
 
       {past.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Anteriores</h2>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Anteriores</p>
           <div className="space-y-2">
             {past.map((hw: any) => (
-              <div key={hw.id} className="bg-white rounded-xl border border-gray-100 px-5 py-3 flex justify-between items-center opacity-50">
+              <div key={hw.id} className="rounded-xl border px-5 py-3 flex justify-between items-center opacity-40" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
                 <div>
-                  <p className="text-sm font-medium text-gray-600 line-through">{hw.title}</p>
-                  <p className="text-xs text-gray-400">{hw.subject}</p>
+                  <p className="text-sm font-medium line-through" style={{ color: 'var(--text-2)' }}>{hw.title}</p>
+                  <p className="text-xs" style={{ color: 'var(--text-3)' }}>{hw.subject}</p>
                 </div>
-                <p className="text-xs text-gray-400">
-                  {new Date(hw.deadline).toLocaleDateString('pt-BR')}
-                </p>
+                <p className="text-xs" style={{ color: 'var(--text-3)' }}>{new Date(hw.deadline).toLocaleDateString('pt-BR')}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
       )}
     </div>
   )

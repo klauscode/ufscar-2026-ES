@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseScriptEnv } from './load-env.mjs'
 
-const supabase = createClient(
-  'https://jivnnjdihejegzeueupf.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imppdm5uamRpaGVqZWd6ZXVldXBmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTA4MTkwNywiZXhwIjoyMDkwNjU3OTA3fQ.A45r92IAiKnawCZ7fPIlK40XOn2nGDmkQBxWebexWu8'
-)
+const { supabaseUrl, serviceRoleKey } = getSupabaseScriptEnv()
+
+const supabase = createClient(supabaseUrl, serviceRoleKey)
 
 const { error } = await supabase.rpc('exec_sql', { sql: `
   create table if not exists files (

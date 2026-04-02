@@ -240,10 +240,6 @@ export default async function HomePage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-[var(--text)]">{item.title}</p>
-                          <p className="mt-1 text-sm text-[var(--accent)]">{item.subject}</p>
-                          {item.description && (
-                            <p className="mt-2 text-sm text-[var(--text-2)]">{item.description}</p>
-                          )}
                         </div>
                         <span
                           className="rounded-full px-3 py-1 text-xs font-semibold"

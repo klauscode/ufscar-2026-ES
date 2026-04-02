@@ -34,7 +34,7 @@ export default function Nav() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
         <Link href="/" className="mr-2 flex shrink-0 items-center gap-3">
           <Image
-            src="/navbar-logo.jpg"
+            src="/navbar-logo.png"
             alt="Logo"
             width={36}
             height={36}

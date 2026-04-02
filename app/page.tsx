@@ -56,7 +56,7 @@ export default async function HomePage() {
       {/* Date header */}
       <div className="flex items-baseline justify-between pt-2 pb-1">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--text-3)' }}>
+          <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: 'var(--text-3)' }}>
             {today.toLocaleDateString('pt-BR', { weekday: 'long' })}
           </p>
           <p className="text-2xl font-bold mt-0.5" style={{ color: 'var(--text)' }}>
@@ -64,7 +64,7 @@ export default async function HomePage() {
           </p>
         </div>
         {homework && homework.length > 0 && (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--accent-bg)', color: 'var(--accent-text)' }}>
+          <span className="text-sm font-semibold px-3 py-1.5 rounded-full" style={{ background: 'var(--accent-bg)', color: 'var(--accent-text)' }}>
             {homework.length} tarefa{homework.length !== 1 ? 's' : ''} pendente{homework.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -75,7 +75,7 @@ export default async function HomePage() {
         <div className="glass rounded-2xl px-5 py-3 flex items-center gap-3" style={{ boxShadow: 'var(--shadow)' }}>
           <span className="text-base shrink-0">📌</span>
           <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{news[0].title}</p>
-          <Link href="/news" className="text-xs shrink-0 font-medium" style={{ color: 'var(--accent)' }}>Ver →</Link>
+          <Link href="/news" className="text-sm shrink-0 font-medium" style={{ color: 'var(--accent)' }}>Ver →</Link>
         </div>
       )}
 
@@ -92,7 +92,7 @@ export default async function HomePage() {
           <div className="glass relative rounded-3xl p-7" style={{ boxShadow: 'none', border: `1px solid ${nextColor}22` }}>
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: nextColor }}>
+                <p className="text-sm font-bold uppercase tracking-widest mb-3" style={{ color: nextColor }}>
                   Próxima Aula · {nextClass.label}
                 </p>
                 <h2 className="text-2xl font-bold leading-snug" style={{ color: 'var(--text)' }}>
@@ -119,7 +119,7 @@ export default async function HomePage() {
                 <p className="text-5xl font-bold tabular-nums leading-none" style={{ color: nextColor }}>
                   {nextClass.start_time?.slice(0,5)}
                 </p>
-                <p className="text-xs mt-1 font-medium" style={{ color: 'var(--text-3)' }}>início</p>
+                <p className="text-sm mt-1 font-medium" style={{ color: 'var(--text-3)' }}>início</p>
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default async function HomePage() {
         <div className="md:col-span-2 glass rounded-2xl overflow-hidden lift" style={{ boxShadow: 'var(--shadow)' }}>
           <div className="px-5 py-4 flex items-center justify-between border-b" style={{ borderColor: 'var(--border)' }}>
             <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Hoje</p>
-            <Link href="/schedule" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>Grade →</Link>
+            <Link href="/schedule" className="text-sm font-medium" style={{ color: 'var(--accent)' }}>Grade →</Link>
           </div>
           {todaySlots.length > 0 ? todaySlots.map(s => {
             const color = subjectColor(s.subject)
@@ -146,8 +146,8 @@ export default async function HomePage() {
               <div key={s.id} className="px-5 py-3.5 flex items-center gap-3 border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
                 <div className="w-1 h-9 rounded-full shrink-0" style={{ background: color }} />
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>{s.subject}</p>
-                  <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text-3)' }}>
+                  <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{s.subject}</p>
+                  <p className="text-sm mt-0.5 font-medium" style={{ color: 'var(--text-3)' }}>
                     {s.start_time?.slice(0,5)}–{s.end_time?.slice(0,5)}{s.room ? ` · ${s.room}` : ''}
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export default async function HomePage() {
         <div className="md:col-span-3 glass rounded-2xl overflow-hidden lift" style={{ boxShadow: 'var(--shadow)' }}>
           <div className="px-5 py-4 flex items-center justify-between border-b" style={{ borderColor: 'var(--border)' }}>
             <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Tarefas</p>
-            <Link href="/homework" className="text-xs font-medium" style={{ color: 'var(--accent)' }}>Ver tudo →</Link>
+            <Link href="/homework" className="text-sm font-medium" style={{ color: 'var(--accent)' }}>Ver tudo →</Link>
           </div>
           {homework && homework.length > 0 ? homework.map(hw => {
             const d = daysUntil(hw.deadline)
@@ -174,10 +174,10 @@ export default async function HomePage() {
                   <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: urgent ? '#ef4444' : soon ? '#f97316' : 'var(--text-3)' }} />
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{hw.title}</p>
-                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
+                    <p className="text-sm mt-0.5 truncate" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold shrink-0 px-2.5 py-1 rounded-full"
+                <span className="text-sm font-bold shrink-0 px-2.5 py-1 rounded-full"
                   style={{
                     background: urgent ? '#fef2f2' : soon ? '#fff7ed' : 'var(--surface-2)',
                     color: urgent ? '#ef4444' : soon ? '#f97316' : 'var(--text-3)',

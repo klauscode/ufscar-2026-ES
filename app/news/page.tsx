@@ -21,13 +21,13 @@ export default async function NewsPage() {
               )}
               <div className="px-6 py-5">
                 {n.pinned && (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold mb-2 px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#d97706' }}>
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold mb-2 px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#d97706' }}>
                     📌 Fixado
                   </span>
                 )}
                 <h2 className="font-semibold text-base" style={{ color: 'var(--text)' }}>{n.title}</h2>
                 <p className="text-sm mt-2 leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-2)' }}>{n.body}</p>
-                <p className="text-xs mt-4" style={{ color: 'var(--text-3)' }}>
+                <p className="text-sm mt-4" style={{ color: 'var(--text-3)' }}>
                   {new Date(n.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </p>
               </div>

@@ -30,15 +30,15 @@ export default async function HomeworkPage() {
               <div className="px-6 py-4 flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold" style={{ color: 'var(--text)' }}>{hw.title}</p>
-                  <p className="text-xs font-medium mt-1" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
+                  <p className="text-sm font-medium mt-1" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
                   {hw.description && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-2)' }}>{hw.description}</p>}
                 </div>
                 <div className="text-right shrink-0">
-                  <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full ${badge || 'text-xs font-semibold px-2.5 py-1 rounded-full'}`}
+                  <span className={`inline-block text-sm font-semibold px-2.5 py-1 rounded-full ${badge || 'text-sm font-semibold px-2.5 py-1 rounded-full'}`}
                     style={!badge ? { background: 'var(--surface-2)', color: 'var(--text-2)' } : {}}>
                     {label}
                   </span>
-                  <p className="text-xs mt-1.5" style={{ color: 'var(--text-3)' }}>
+                  <p className="text-sm mt-1.5" style={{ color: 'var(--text-3)' }}>
                     {new Date(hw.deadline).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </p>
                 </div>
@@ -56,15 +56,15 @@ export default async function HomeworkPage() {
 
       {past.length > 0 && (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Anteriores</p>
+          <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Anteriores</p>
           <div className="space-y-2">
             {past.map((hw: any) => (
               <div key={hw.id} className="rounded-xl border px-5 py-3 flex justify-between items-center opacity-40" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
                 <div>
                   <p className="text-sm font-medium line-through" style={{ color: 'var(--text-2)' }}>{hw.title}</p>
-                  <p className="text-xs" style={{ color: 'var(--text-3)' }}>{hw.subject}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-3)' }}>{hw.subject}</p>
                 </div>
-                <p className="text-xs" style={{ color: 'var(--text-3)' }}>{new Date(hw.deadline).toLocaleDateString('pt-BR')}</p>
+                <p className="text-sm" style={{ color: 'var(--text-3)' }}>{new Date(hw.deadline).toLocaleDateString('pt-BR')}</p>
               </div>
             ))}
           </div>

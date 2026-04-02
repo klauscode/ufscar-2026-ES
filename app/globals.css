@@ -3,44 +3,42 @@
 @layer base {
   :root {
     --bg: #f0f2f8;
-    --surface: rgba(255,255,255,0.9);
+    --surface: rgba(255,255,255,0.92);
     --surface-solid: #ffffff;
     --surface-2: #f4f5fb;
-    --border: rgba(0,0,0,0.07);
-    --border-strong: rgba(0,0,0,0.12);
-    --text: #0d0f1a;
-    --text-2: #5a5f7a;
-    --text-3: #9499b5;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+    --text: #111318;
+    --text-2: #4b5069;
+    --text-3: #7a7f99;
     --accent: #4f46e5;
     --accent-2: #7c3aed;
     --accent-bg: rgba(79,70,229,0.08);
     --accent-text: #4338ca;
-    --nav-bg: rgba(255,255,255,0.75);
-    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.1);
-    --glow: 0 0 0 1px rgba(79,70,229,0.15), 0 8px 32px rgba(79,70,229,0.15);
-    --dot-color: rgba(0,0,0,0.07);
+    --nav-bg: rgba(255,255,255,0.78);
+    --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 4px 14px rgba(0,0,0,0.07);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    --dot-color: rgba(0,0,0,0.06);
   }
 
   [data-theme="dark"] {
-    --bg: #080910;
-    --surface: rgba(255,255,255,0.04);
-    --surface-solid: #111218;
-    --surface-2: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.07);
-    --border-strong: rgba(255,255,255,0.12);
-    --text: #eceef8;
-    --text-2: #7c809a;
-    --text-3: #454860;
-    --accent: #6366f1;
-    --accent-2: #818cf8;
-    --accent-bg: rgba(99,102,241,0.12);
-    --accent-text: #a5b4fc;
-    --nav-bg: rgba(8,9,16,0.8);
-    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
-    --glow: 0 0 0 1px rgba(99,102,241,0.2), 0 8px 32px rgba(99,102,241,0.2);
-    --dot-color: rgba(255,255,255,0.04);
+    --bg: #09090f;
+    --surface: rgba(255,255,255,0.06);
+    --surface-solid: #131420;
+    --surface-2: rgba(255,255,255,0.09);
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.16);
+    --text: #f0f1f7;
+    --text-2: #a8adc4;
+    --text-3: #747a96;
+    --accent: #818cf8;
+    --accent-2: #a5b4fc;
+    --accent-bg: rgba(129,140,248,0.14);
+    --accent-text: #c7d2fe;
+    --nav-bg: rgba(9,9,15,0.82);
+    --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 4px 14px rgba(0,0,0,0.35);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.55);
+    --dot-color: rgba(255,255,255,0.035);
   }
 
   html {
@@ -52,9 +50,10 @@
     background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
     background-size: 28px 28px;
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
   }
 
   ::selection { background: var(--accent-bg); color: var(--accent); }

@@ -33,22 +33,22 @@ export default async function SchedulePage() {
               boxShadow: i === today ? '0 0 0 1px var(--accent), var(--shadow)' : 'var(--shadow)',
             }}
           >
-            <div className="px-4 py-3 flex items-center justify-between border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-              <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{day}</span>
+            <div className="px-4 py-3 flex items-center justify-between border-b" style={{ borderColor: 'var(--border)' }}>
+              <span className="font-semibold text-base" style={{ color: 'var(--text)' }}>{day}</span>
               {i === today && (
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>Hoje</span>
+                <span className="text-sm font-semibold px-2.5 py-0.5 rounded-full" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>Hoje</span>
               )}
             </div>
             <div>
               {byDay[i].length > 0 ? byDay[i].map((s: any) => (
-                <div key={s.id} className="px-4 py-3 flex items-center gap-3 border-b last:border-0" style={{ borderColor: 'var(--border-subtle)' }}>
+                <div key={s.id} className="px-4 py-3 flex items-center gap-3 border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
                   <div className="w-1 h-10 rounded-full shrink-0" style={{ background: subjectColor(s.subject) }} />
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{s.subject}</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>
+                    <p className="text-sm mt-0.5" style={{ color: 'var(--text-2)' }}>
                       {s.start_time?.slice(0,5)}–{s.end_time?.slice(0,5)}{s.room ? ` · ${s.room}` : ''}
                     </p>
-                    {s.professor && <p className="text-xs" style={{ color: 'var(--text-3)' }}>{s.professor}</p>}
+                    {s.professor && <p className="text-sm" style={{ color: 'var(--text-3)' }}>{s.professor}</p>}
                   </div>
                 </div>
               )) : (

@@ -3,6 +3,8 @@ import { requireAdminPage } from '@/lib/admin-auth'
 import { supabase } from '@/lib/supabase'
 import type { FileItem, HomeworkItem, NewsItem, ScheduleItem, TodoItem } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
   const user = await requireAdminPage()
 

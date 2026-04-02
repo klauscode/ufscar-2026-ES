@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { HomeworkItem, NewsItem, ScheduleItem } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 const DAY_NAMES = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo']
 const COLORS = ['#0f6c74', '#134f7a', '#3f6f44', '#a94d1e', '#7b495a', '#556173']
 
@@ -82,18 +84,10 @@ export default async function HomePage() {
           }}
         >
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-3">
-              <p className="font-display text-xs uppercase tracking-[0.34em] text-[var(--text-3)]">
-                Dashboard da turma
-              </p>
-              <div>
-                <h1 className="text-3xl font-semibold text-[var(--text)] md:text-4xl">
-                  Organize a semana com menos atrito.
-                </h1>
-                <p className="mt-2 max-w-2xl text-sm text-[var(--text-2)] md:text-base">
-                  Horarios, tarefas, arquivos e avisos em um lugar so para a turma de Educacao Especial.
-                </p>
-              </div>
+            <div>
+              <h1 className="text-3xl font-semibold text-[var(--text)] md:text-4xl">
+                Educacao Especial 2026
+              </h1>
             </div>
             <div className="rounded-full border px-4 py-2 text-sm font-semibold" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)', color: 'var(--text-2)' }}>
               {today.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
@@ -202,7 +196,6 @@ export default async function HomePage() {
           <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div>
               <p className="font-display text-lg font-semibold text-[var(--text)]">Hoje</p>
-              <p className="text-sm text-[var(--text-3)]">Resumo da grade do dia</p>
             </div>
             <Link href="/schedule" className="text-sm font-semibold text-[var(--accent)]">Ver grade</Link>
           </div>
@@ -240,7 +233,6 @@ export default async function HomePage() {
           <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
             <div>
               <p className="font-display text-lg font-semibold text-[var(--text)]">Prazos proximos</p>
-              <p className="text-sm text-[var(--text-3)]">Tarefas com vencimento mais proximo</p>
             </div>
             <Link href="/homework" className="text-sm font-semibold text-[var(--accent)]">Ver tarefas</Link>
           </div>

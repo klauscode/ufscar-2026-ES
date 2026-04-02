@@ -2,6 +2,8 @@ import FilesView from '@/components/FilesView'
 import { supabase } from '@/lib/supabase'
 import type { FileItem, ScheduleItem } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ArquivosPage() {
   const [{ data: filesData }, { data: scheduleData }] = await Promise.all([
     supabase.from('files').select('*').order('file_date', { ascending: false }),
@@ -15,13 +17,7 @@ export default async function ArquivosPage() {
   return (
     <div className="space-y-6">
       <header className="panel px-6 py-6">
-        <p className="font-display text-xs uppercase tracking-[0.34em] text-[var(--text-3)]">
-          Materiais
-        </p>
         <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Arquivos por materia</h1>
-        <p className="mt-2 text-sm text-[var(--text-2)]">
-          Centralize links de slides, PDFs, textos e qualquer material compartilhado.
-        </p>
       </header>
 
       {subjects.length > 0 ? (

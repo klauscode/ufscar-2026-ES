@@ -19,13 +19,14 @@ function urgency(deadline: string, nowIso: string) {
 }
 
 export default function HomeworkBoard({ items, nowIso }: Props) {
+  const nowTime = useMemo(() => new Date(nowIso).getTime(), [nowIso])
   const upcoming = useMemo(
-    () => items.filter((item) => item.deadline >= nowIso),
-    [items, nowIso]
+    () => items.filter((item) => new Date(item.deadline).getTime() >= nowTime),
+    [items, nowTime]
   )
   const past = useMemo(
-    () => items.filter((item) => item.deadline < nowIso),
-    [items, nowIso]
+    () => items.filter((item) => new Date(item.deadline).getTime() < nowTime),
+    [items, nowTime]
   )
   const [selectedId, setSelectedId] = useState<string | null>(upcoming[0]?.id ?? null)
 

@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Admin route: must have a valid admin session cookie set by /api/admin/login
+  // Admin pages: need admin session
   if (pathname.startsWith('/admin')) {
     const adminSession = req.cookies.get('admin_session')
     if (!adminSession) {
@@ -19,7 +19,16 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // All other routes: must have the class password cookie
+  // Admin API routes: need admin session cookie
+  if (pathname.startsWith('/api/admin/')) {
+    const adminSession = req.cookies.get('admin_session')
+    if (!adminSession) {
+      return NextResponse.json({ error: 'Not authorized' }, { status: 401 })
+    }
+    return NextResponse.next()
+  }
+
+  // All other routes: need class password cookie
   const classAccess = req.cookies.get('class_access')
   if (!classAccess || classAccess.value !== 'granted') {
     return NextResponse.redirect(new URL('/enter', req.url))

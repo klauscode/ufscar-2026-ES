@@ -5,14 +5,12 @@ import AdminFiles from './admin/AdminFiles'
 import AdminHomework from './admin/AdminHomework'
 import AdminNews from './admin/AdminNews'
 import AdminSchedule from './admin/AdminSchedule'
-import AdminTodos from './admin/AdminTodos'
-import type { FileItem, HomeworkItem, NewsItem, ScheduleItem, TodoItem } from '@/lib/types'
+import type { FileItem, HomeworkItem, NewsItem, ScheduleItem } from '@/lib/types'
 
 const TABS = [
   { key: 'schedule', label: 'Horarios' },
   { key: 'homework', label: 'Tarefas' },
   { key: 'files', label: 'Arquivos' },
-  { key: 'todos', label: 'Checklist' },
   { key: 'news', label: 'Avisos' },
 ] as const
 
@@ -23,7 +21,6 @@ type Props = {
   initialHomework: HomeworkItem[]
   initialFiles: FileItem[]
   initialNews: NewsItem[]
-  initialTodos: TodoItem[]
 }
 
 export default function AdminPanel({
@@ -31,7 +28,6 @@ export default function AdminPanel({
   initialHomework,
   initialFiles,
   initialNews,
-  initialTodos,
 }: Props) {
   const [tab, setTab] = useState<TabKey>('schedule')
   const subjects = [...new Set(initialSchedule.map((item) => item.subject))]
@@ -57,7 +53,6 @@ export default function AdminPanel({
       {tab === 'schedule' && <AdminSchedule initial={initialSchedule} />}
       {tab === 'homework' && <AdminHomework initial={initialHomework} subjects={subjects} />}
       {tab === 'files' && <AdminFiles initial={initialFiles} subjects={subjects} />}
-      {tab === 'todos' && <AdminTodos initial={initialTodos} />}
       {tab === 'news' && <AdminNews initial={initialNews} />}
     </div>
   )

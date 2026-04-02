@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import type { NewsItem } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewsPage() {
   const { data } = await supabase
     .from('news')
@@ -16,10 +18,7 @@ export default async function NewsPage() {
         <p className="font-display text-xs uppercase tracking-[0.34em] text-[var(--text-3)]">
           Comunicados
         </p>
-        <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Avisos da turma</h1>
-        <p className="mt-2 text-sm text-[var(--text-2)]">
-          Informes importantes com destaque automatico para o que foi fixado.
-        </p>
+        <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Avisos</h1>
       </header>
 
       {news.length > 0 ? (
@@ -53,7 +52,6 @@ export default async function NewsPage() {
       ) : (
         <div className="panel px-6 py-12 text-center">
           <p className="font-display text-2xl font-semibold text-[var(--text)]">Nenhum aviso no momento</p>
-          <p className="mt-2 text-sm text-[var(--text-3)]">Quando sair algo novo, ele aparece aqui.</p>
         </div>
       )}
     </div>

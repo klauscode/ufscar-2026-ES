@@ -12,7 +12,7 @@ export default async function HomeworkPage() {
   return (
     <div className="space-y-6">
       <header className="panel px-6 py-6">
-        <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Tarefas da turma</h1>
+        <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Tarefas</h1>
       </header>
 
       <HomeworkBoard items={homework} nowIso={nowIso} />

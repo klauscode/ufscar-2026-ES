@@ -57,12 +57,10 @@ export default async function HomePage() {
     { data: scheduleData },
     { data: homeworkData },
     { data: newsData },
-    { count: todoCount },
   ] = await Promise.all([
     supabase.from('schedule').select('*').order('day_of_week').order('start_time'),
     supabase.from('homework').select('*').gte('deadline', new Date().toISOString()).order('deadline').limit(4),
     supabase.from('news').select('*').eq('pinned', true).order('created_at', { ascending: false }).limit(1),
-    supabase.from('todos').select('*', { count: 'exact', head: true }).eq('done', false),
   ])
 
   const allSlots: ScheduleItem[] = scheduleData ?? []
@@ -118,14 +116,10 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-1">
                 <div className="rounded-[1.25rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
                   <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-3)]">Tarefas abertas</p>
                   <p className="mt-2 font-display text-3xl font-semibold text-[var(--text)]">{homework.length}</p>
-                </div>
-                <div className="rounded-[1.25rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
-                  <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-3)]">Checklist</p>
-                  <p className="mt-2 font-display text-3xl font-semibold text-[var(--text)]">{todoCount ?? 0}</p>
                 </div>
                 <div className="rounded-[1.25rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
                   <p className="text-xs uppercase tracking-[0.24em] text-[var(--text-3)]">Aulas hoje</p>
@@ -145,7 +139,6 @@ export default async function HomePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-display text-lg font-semibold text-[var(--text)]">Aviso em destaque</p>
-                <p className="text-sm text-[var(--text-3)]">Comunicados importantes da turma</p>
               </div>
               <Link href="/news" className="text-sm font-semibold text-[var(--accent)]">
                 Ver avisos
@@ -167,7 +160,6 @@ export default async function HomePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-display text-lg font-semibold text-[var(--text)]">Atalhos</p>
-                <p className="text-sm text-[var(--text-3)]">Use as areas mais consultadas</p>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
@@ -175,7 +167,7 @@ export default async function HomePage() {
                 { href: '/schedule', label: 'Horarios' },
                 { href: '/homework', label: 'Tarefas' },
                 { href: '/arquivos', label: 'Arquivos' },
-                { href: '/todos', label: 'Checklist' },
+                { href: '/news', label: 'Avisos' },
               ].map((link) => (
                 <Link
                   key={link.href}

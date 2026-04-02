@@ -9,7 +9,6 @@ Dashboard da turma de Educacao Especial 2026 da UFSCar.
 - Lista de tarefas com prazos
 - Arquivos por materia
 - Avisos da turma
-- Checklist compartilhado
 - Painel admin para atualizar tudo
 
 ## Stack

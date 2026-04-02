@@ -53,7 +53,6 @@ npm run dev
 - Horarios
 - Tarefas
 - Arquivos
-- Checklist
 - Avisos
 
 ## 7. Atualizacao de conteudo

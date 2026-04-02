@@ -1,7 +1,7 @@
 import AdminPanel from '@/components/AdminPanel'
 import { requireAdminPage } from '@/lib/admin-auth'
 import { supabase } from '@/lib/supabase'
-import type { FileItem, HomeworkItem, NewsItem, ScheduleItem, TodoItem } from '@/lib/types'
+import type { FileItem, HomeworkItem, NewsItem, ScheduleItem } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,13 +13,11 @@ export default async function AdminPage() {
     { data: homeworkData },
     { data: filesData },
     { data: newsData },
-    { data: todosData },
   ] = await Promise.all([
     supabase.from('schedule').select('*').order('day_of_week').order('start_time'),
     supabase.from('homework').select('*').order('deadline'),
     supabase.from('files').select('*').order('file_date', { ascending: false }),
     supabase.from('news').select('*').order('created_at', { ascending: false }),
-    supabase.from('todos').select('*').order('created_at'),
   ])
 
   return (
@@ -46,7 +44,6 @@ export default async function AdminPage() {
         initialHomework={(homeworkData ?? []) as HomeworkItem[]}
         initialFiles={(filesData ?? []) as FileItem[]}
         initialNews={(newsData ?? []) as NewsItem[]}
-        initialTodos={(todosData ?? []) as TodoItem[]}
       />
     </div>
   )

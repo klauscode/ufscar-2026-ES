@@ -10,7 +10,6 @@ const links = [
   { href: '/schedule', label: 'Horarios' },
   { href: '/homework', label: 'Tarefas' },
   { href: '/arquivos', label: 'Arquivos' },
-  { href: '/todos', label: 'Checklist' },
   { href: '/news', label: 'Avisos' },
 ]
 

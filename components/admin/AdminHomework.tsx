@@ -23,6 +23,11 @@ const emptyForm = (subject = ''): FormState => ({
   deadline: '',
 })
 
+function toUtcIso(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? value : date.toISOString()
+}
+
 function toInputDateTime(value: string) {
   const date = new Date(value)
   const timezoneOffset = date.getTimezoneOffset() * 60_000
@@ -58,7 +63,11 @@ export default function AdminHomework({ initial, subjects }: Props) {
     setError('')
 
     const method = editingId ? 'PATCH' : 'POST'
-    const payload = editingId ? { id: editingId, ...form } : form
+    const payloadBase = {
+      ...form,
+      deadline: toUtcIso(form.deadline),
+    }
+    const payload = editingId ? { id: editingId, ...payloadBase } : payloadBase
 
     const response = await fetch('/api/admin/homework', {
       method,

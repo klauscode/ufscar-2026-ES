@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import BrandMark from './BrandMark'
@@ -31,7 +32,15 @@ export default function Nav() {
       }}
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
-        <Link href="/" className="mr-2 shrink-0">
+        <Link href="/" className="mr-2 flex shrink-0 items-center gap-3">
+          <Image
+            src="/navbar-logo.jpg"
+            alt="Logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-lg object-cover"
+            priority
+          />
           <BrandMark compact />
         </Link>
 

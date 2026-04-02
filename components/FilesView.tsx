@@ -1,82 +1,82 @@
 'use client'
 
 import { useState } from 'react'
+import type { FileItem } from '@/lib/types'
 
-type File = { id: string; subject: string; title: string; url: string; file_date: string }
-
-function fileIcon(url: string) {
-  const u = url.toLowerCase()
-  if (u.includes('docs.google') || u.includes('document')) return '📝'
-  if (u.includes('presentation') || u.includes('ppt') || u.includes('slides')) return '📊'
-  if (u.includes('spreadsheet') || u.includes('sheet') || u.includes('xls')) return '📋'
-  return '📄'
+function fileLabel(url: string) {
+  const lower = url.toLowerCase()
+  if (lower.includes('slides') || lower.includes('presentation') || lower.includes('ppt')) return 'Slides'
+  if (lower.includes('docs.google') || lower.includes('document')) return 'Doc'
+  if (lower.includes('sheet') || lower.includes('spreadsheet') || lower.includes('xls')) return 'Planilha'
+  return 'Arquivo'
 }
 
-export default function FilesView({ files, subjects }: { files: File[]; subjects: string[] }) {
+type Props = {
+  files: FileItem[]
+  subjects: string[]
+}
+
+export default function FilesView({ files, subjects }: Props) {
   const [selected, setSelected] = useState(subjects[0] ?? '')
 
   const filtered = files
-    .filter(f => f.subject === selected)
-    .sort((a, b) => new Date(b.file_date).getTime() - new Date(a.file_date).getTime())
+    .filter((file) => file.subject === selected)
+    .sort((left, right) => new Date(right.file_date).getTime() - new Date(left.file_date).getTime())
 
   return (
-    <div className="space-y-6">
-      {/* Subject pills */}
+    <div className="space-y-5">
       <div className="flex flex-wrap gap-2">
-        {subjects.map(s => (
+        {subjects.map((subject) => (
           <button
-            key={s}
-            onClick={() => setSelected(s)}
-            className="px-3 py-1.5 rounded-full text-sm font-medium transition-all"
+            key={subject}
+            onClick={() => setSelected(subject)}
+            className="rounded-full px-4 py-2 text-sm font-semibold"
             style={{
-              background: selected === s ? 'var(--accent)' : 'var(--surface)',
-              color: selected === s ? '#fff' : 'var(--text-2)',
-              border: `1px solid ${selected === s ? 'var(--accent)' : 'var(--border)'}`,
-              boxShadow: selected === s ? '0 4px 12px rgba(79,70,229,0.3)' : 'var(--shadow)',
+              background: selected === subject ? 'var(--accent)' : 'var(--surface)',
+              color: selected === subject ? '#ffffff' : 'var(--text-2)',
+              border: `1px solid ${selected === subject ? 'var(--accent)' : 'var(--border)'}`,
+              boxShadow: selected === subject ? 'var(--shadow)' : 'none',
             }}
           >
-            {s}
+            {subject}
           </button>
         ))}
       </div>
 
-      {/* Files for selected subject */}
-      <div>
-        {filtered.length > 0 ? (
-          <ul className="space-y-2">
-            {filtered.map(f => (
-              <li key={f.id}>
-                <a
-                  href={f.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 rounded-2xl border px-5 py-4 transition-all group"
-                  style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow)', textDecoration: 'none' }}
-                  onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent)' }}
-                  onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)' }}
-                >
-                  <span className="text-2xl shrink-0">{fileIcon(f.url)}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate" style={{ color: 'var(--text)' }}>{f.title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>
-                      {new Date(f.file_date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-                    </p>
-                  </div>
-                  <span className="text-sm font-medium shrink-0 transition-all" style={{ color: 'var(--accent)' }}>
-                    Abrir →
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="rounded-2xl border px-6 py-12 text-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-            <p className="text-3xl mb-2">📂</p>
-            <p className="font-semibold" style={{ color: 'var(--text)' }}>Nenhum arquivo ainda.</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-3)' }}>O admin pode adicionar arquivos nesta matéria.</p>
-          </div>
-        )}
-      </div>
+      {filtered.length > 0 ? (
+        <div className="grid gap-3">
+          {filtered.map((file) => (
+            <a
+              key={file.id}
+              href={file.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="panel flex items-center gap-4 px-5 py-4 hover:-translate-y-0.5"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="rounded-[1rem] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}>
+                {fileLabel(file.url)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-[var(--text)]">{file.title}</p>
+                <p className="mt-1 text-sm text-[var(--text-3)]">
+                  {new Date(`${file.file_date}T12:00:00`).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+              <span className="text-sm font-semibold text-[var(--accent)]">Abrir</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-display text-2xl font-semibold text-[var(--text)]">Nenhum arquivo ainda</p>
+          <p className="mt-2 text-sm text-[var(--text-3)]">O admin pode adicionar materiais para esta materia.</p>
+        </div>
+      )}
     </div>
   )
 }

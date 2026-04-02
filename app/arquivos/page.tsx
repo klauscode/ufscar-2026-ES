@@ -1,30 +1,35 @@
-import { supabase } from '@/lib/supabase'
 import FilesView from '@/components/FilesView'
+import { supabase } from '@/lib/supabase'
+import type { FileItem, ScheduleItem } from '@/lib/types'
 
 export default async function ArquivosPage() {
-  const [{ data: files }, { data: schedule }] = await Promise.all([
+  const [{ data: filesData }, { data: scheduleData }] = await Promise.all([
     supabase.from('files').select('*').order('file_date', { ascending: false }),
-    supabase.from('schedule').select('subject').order('day_of_week'),
+    supabase.from('schedule').select('*').order('day_of_week'),
   ])
 
-  // Unique subjects in schedule order
-  const subjects = [...new Set(schedule?.map((s: any) => s.subject) ?? [])]
+  const files: FileItem[] = filesData ?? []
+  const schedule: ScheduleItem[] = scheduleData ?? []
+  const subjects = [...new Set(schedule.map((item) => item.subject))]
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Arquivos</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--text-2)' }}>
-          Slides, PDFs e materiais por matéria
+      <header className="panel px-6 py-6">
+        <p className="font-display text-xs uppercase tracking-[0.34em] text-[var(--text-3)]">
+          Materiais
         </p>
-      </div>
+        <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Arquivos por materia</h1>
+        <p className="mt-2 text-sm text-[var(--text-2)]">
+          Centralize links de slides, PDFs, textos e qualquer material compartilhado.
+        </p>
+      </header>
 
       {subjects.length > 0 ? (
-        <FilesView files={files ?? []} subjects={subjects} />
+        <FilesView files={files} subjects={subjects} />
       ) : (
-        <div className="rounded-2xl border px-6 py-12 text-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <p className="text-3xl mb-2">📚</p>
-          <p className="font-semibold" style={{ color: 'var(--text)' }}>Nenhuma matéria na grade ainda.</p>
+        <div className="panel px-6 py-12 text-center">
+          <p className="font-display text-2xl font-semibold text-[var(--text)]">Nenhuma materia cadastrada</p>
+          <p className="mt-2 text-sm text-[var(--text-3)]">Cadastre a grade primeiro para organizar os arquivos.</p>
         </div>
       )}
     </div>

@@ -1,100 +1,162 @@
 'use client'
 
 import { useState } from 'react'
+import type { ScheduleItem } from '@/lib/types'
 
-const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+const DAYS = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado', 'Domingo']
 
-export default function AdminSchedule({ initial }: { initial: any[] }) {
+type FormState = {
+  day_of_week: number
+  start_time: string
+  end_time: string
+  subject: string
+  room: string
+  professor: string
+}
+
+type Props = {
+  initial: ScheduleItem[]
+}
+
+const emptyForm: FormState = {
+  day_of_week: 0,
+  start_time: '',
+  end_time: '',
+  subject: '',
+  room: '',
+  professor: '',
+}
+
+export default function AdminSchedule({ initial }: Props) {
   const [slots, setSlots] = useState(initial)
-  const [form, setForm] = useState({ day_of_week: 0, start_time: '', end_time: '', subject: '', room: '', professor: '' })
+  const [form, setForm] = useState<FormState>(emptyForm)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault()
+  async function add(event: React.FormEvent) {
+    event.preventDefault()
     setLoading(true)
-    const res = await fetch('/api/admin/schedule', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-    if (res.ok) { setForm({ day_of_week: 0, start_time: '', end_time: '', subject: '', room: '', professor: '' }); window.location.reload() }
+    setError('')
+
+    const response = await fetch('/api/admin/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+
+    const body = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      setError(body.error || 'Nao foi possivel salvar a aula.')
+      setLoading(false)
+      return
+    }
+
+    setSlots((current) =>
+      [...current, body.item as ScheduleItem].sort((left, right) =>
+        left.day_of_week === right.day_of_week
+          ? left.start_time.localeCompare(right.start_time)
+          : left.day_of_week - right.day_of_week
+      )
+    )
+    setForm(emptyForm)
     setLoading(false)
   }
 
   async function remove(id: string) {
-    await fetch('/api/admin/schedule', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    setSlots(prev => prev.filter(s => s.id !== id))
+    const response = await fetch('/api/admin/schedule', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+
+    if (response.ok) {
+      setSlots((current) => current.filter((item) => item.id !== id))
+    }
   }
 
-  const inputStyle = { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }
-  const labelStyle = { color: 'var(--text-2)' }
-
   return (
-    <div className="space-y-6">
-      <form onSubmit={add} className="rounded-2xl border p-6 space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <h2 className="font-semibold" style={{ color: 'var(--text)' }}>Adicionar aula</h2>
-        <div className="grid grid-cols-2 gap-4">
+    <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr]">
+      <form onSubmit={add} className="panel space-y-4 px-6 py-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Adicionar aula</h2>
+          <p className="text-sm text-[var(--text-3)]">Cadastre o horario base da semana.</p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Dia</label>
-            <select value={form.day_of_week} onChange={e => setForm({ ...form, day_of_week: Number(e.target.value) })}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle}>
-              {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Dia</label>
+            <select
+              value={form.day_of_week}
+              onChange={(event) => setForm({ ...form, day_of_week: Number(event.target.value) })}
+              className="input"
+            >
+              {DAYS.map((day, index) => (
+                <option key={day} value={index}>
+                  {day}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Matéria</label>
-            <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })}
-              placeholder="Ex: Ética e Educação Especial"
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} required />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Materia</label>
+            <input value={form.subject} onChange={(event) => setForm({ ...form, subject: event.target.value })} className="input" required />
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Início</label>
-            <input type="time" value={form.start_time} onChange={e => setForm({ ...form, start_time: e.target.value })}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} required />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Inicio</label>
+            <input type="time" value={form.start_time} onChange={(event) => setForm({ ...form, start_time: event.target.value })} className="input" required />
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Fim</label>
-            <input type="time" value={form.end_time} onChange={e => setForm({ ...form, end_time: e.target.value })}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} required />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Fim</label>
+            <input type="time" value={form.end_time} onChange={(event) => setForm({ ...form, end_time: event.target.value })} className="input" required />
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Sala</label>
-            <input value={form.room} onChange={e => setForm({ ...form, room: e.target.value })}
-              placeholder="Ex: AT2 Sala 31"
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Sala</label>
+            <input value={form.room} onChange={(event) => setForm({ ...form, room: event.target.value })} className="input" />
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Professor(a)</label>
-            <input value={form.professor} onChange={e => setForm({ ...form, professor: e.target.value })}
-              placeholder="Ex: Profa. Rosimeire Orlando"
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Professor</label>
+            <input value={form.professor} onChange={(event) => setForm({ ...form, professor: event.target.value })} className="input" />
           </div>
         </div>
-        <button type="submit" disabled={loading}
-          className="py-2 px-5 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
+
+        {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
+
+        <button type="submit" disabled={loading} className="button-primary px-5 py-3 text-sm disabled:opacity-60">
           {loading ? 'Salvando...' : 'Adicionar aula'}
         </button>
       </form>
 
-      <div>
-        <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>Aulas cadastradas</h2>
-        {slots.length === 0 ? <p className="text-sm" style={{ color: 'var(--text-3)' }}>Nenhuma aula.</p> : (
-          <ul className="space-y-2">
-            {slots.map(s => (
-              <li key={s.id} className="rounded-xl border px-4 py-3 flex justify-between items-center" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                <div>
-                  <p className="font-medium text-sm" style={{ color: 'var(--text)' }}>{s.subject} — {DAYS[s.day_of_week]}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>
-                    {s.start_time?.slice(0,5)}–{s.end_time?.slice(0,5)}{s.room ? ` · ${s.room}` : ''}{s.professor ? ` · ${s.professor}` : ''}
-                  </p>
+      <section className="panel px-6 py-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Aulas cadastradas</h2>
+          <p className="text-sm text-[var(--text-3)]">Use esta lista para revisar a grade.</p>
+        </div>
+        <div className="mt-4 space-y-3">
+          {slots.length > 0 ? (
+            slots.map((slot) => (
+              <div key={slot.id} className="rounded-[1rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--text)]">{slot.subject}</p>
+                    <p className="mt-1 text-sm text-[var(--text-2)]">
+                      {DAYS[slot.day_of_week]} · {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--text-3)]">
+                      {[slot.room, slot.professor].filter(Boolean).join(' · ') || 'Sem detalhes extras'}
+                    </p>
+                  </div>
+                  <button onClick={() => remove(slot.id)} className="text-sm font-semibold text-[var(--danger)]">
+                    Remover
+                  </button>
                 </div>
-                <button onClick={() => remove(s.id)} className="text-xs ml-4 font-medium transition-all" style={{ color: 'var(--text-3)' }}
-                  onMouseOver={e => (e.currentTarget.style.color = '#ef4444')}
-                  onMouseOut={e => (e.currentTarget.style.color = 'var(--text-3)')}>
-                  Remover
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-[var(--text-3)]">Nenhuma aula cadastrada.</p>
+          )}
+        </div>
+      </section>
     </div>
   )
 }

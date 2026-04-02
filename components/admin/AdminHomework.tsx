@@ -1,119 +1,240 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import MarkdownPreview from '@/components/MarkdownPreview'
+import type { HomeworkItem } from '@/lib/types'
 
-type Props = { initial: any[]; subjects: string[] }
+type Props = {
+  initial: HomeworkItem[]
+  subjects: string[]
+}
+
+type FormState = {
+  subject: string
+  title: string
+  description: string
+  deadline: string
+}
+
+const emptyForm = (subject = ''): FormState => ({
+  subject,
+  title: '',
+  description: '',
+  deadline: '',
+})
+
+function toInputDateTime(value: string) {
+  const date = new Date(value)
+  const timezoneOffset = date.getTimezoneOffset() * 60_000
+  return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16)
+}
+
+function sortHomework(items: HomeworkItem[]) {
+  return [...items].sort(
+    (left, right) => new Date(left.deadline).getTime() - new Date(right.deadline).getTime()
+  )
+}
 
 export default function AdminHomework({ initial, subjects }: Props) {
-  const [items, setItems] = useState(initial)
-  const [form, setForm] = useState({ subject: subjects[0] ?? '', title: '', description: '', deadline: '' })
+  const defaultSubject = subjects[0] ?? ''
+  const [items, setItems] = useState(sortHomework(initial))
+  const [form, setForm] = useState<FormState>(emptyForm(defaultSubject))
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [previewOpen, setPreviewOpen] = useState(false)
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault()
+  const submitLabel = editingId ? 'Salvar alteracoes' : 'Adicionar tarefa'
+  const previewContent = form.description.trim()
+
+  const selectedEditingItem = useMemo(
+    () => items.find((item) => item.id === editingId) ?? null,
+    [items, editingId]
+  )
+
+  async function save(event: React.FormEvent) {
+    event.preventDefault()
     setLoading(true)
-    const res = await fetch('/api/admin/homework', {
-      method: 'POST',
+    setError('')
+
+    const method = editingId ? 'PATCH' : 'POST'
+    const payload = editingId ? { id: editingId, ...form } : form
+
+    const response = await fetch('/api/admin/homework', {
+      method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify(payload),
     })
-    if (res.ok) { setForm({ subject: subjects[0] ?? '', title: '', description: '', deadline: '' }); window.location.reload() }
+
+    const body = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      setError(body.error || 'Nao foi possivel salvar a tarefa.')
+      setLoading(false)
+      return
+    }
+
+    const saved = body.item as HomeworkItem
+
+    setItems((current) =>
+      sortHomework(
+        editingId
+          ? current.map((item) => (item.id === saved.id ? saved : item))
+          : [...current, saved]
+      )
+    )
+    setForm(emptyForm(defaultSubject))
+    setEditingId(null)
     setLoading(false)
   }
 
-  async function remove(id: string) {
-    await fetch('/api/admin/homework', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    setItems(prev => prev.filter(i => i.id !== id))
+  function startEdit(item: HomeworkItem) {
+    setEditingId(item.id)
+    setError('')
+    setForm({
+      subject: item.subject,
+      title: item.title,
+      description: item.description ?? '',
+      deadline: toInputDateTime(item.deadline),
+    })
   }
 
-  const inputStyle = { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }
-  const labelStyle = { color: 'var(--text-2)' }
+  function cancelEdit() {
+    setEditingId(null)
+    setError('')
+    setForm(emptyForm(defaultSubject))
+  }
+
+  async function remove(id: string) {
+    const response = await fetch('/api/admin/homework', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+
+    if (response.ok) {
+      setItems((current) => current.filter((item) => item.id !== id))
+      if (editingId === id) {
+        cancelEdit()
+      }
+    }
+  }
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={add} className="rounded-2xl border p-6 space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <h2 className="font-semibold" style={{ color: 'var(--text)' }}>Adicionar tarefa</h2>
-        <div className="grid grid-cols-2 gap-4">
+    <div className="grid gap-5 lg:grid-cols-[1fr_1.12fr]">
+      <form onSubmit={save} className="panel space-y-4 px-6 py-6">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Matéria</label>
+            <h2 className="font-display text-xl font-semibold text-[var(--text)]">
+              {editingId ? 'Editar tarefa' : 'Adicionar tarefa'}
+            </h2>
+            <p className="text-sm text-[var(--text-3)]">
+              A descricao aceita markdown simples: `#`, `-`, `1.`, `**negrito**`, `*italico*`, `` `codigo` `` e links.
+            </p>
+          </div>
+          {editingId && (
+            <button type="button" onClick={cancelEdit} className="button-secondary px-4 py-2 text-sm">
+              Cancelar
+            </button>
+          )}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Materia</label>
             <select
               value={form.subject}
-              onChange={e => setForm({ ...form, subject: e.target.value })}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none"
-              style={inputStyle}
+              onChange={(event) => setForm({ ...form, subject: event.target.value })}
+              className="input"
               required
             >
-              {subjects.map(s => <option key={s} value={s}>{s}</option>)}
-              {subjects.length === 0 && <option value="">Adicione matérias na grade primeiro</option>}
+              {subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+              {subjects.length === 0 && <option value="">Cadastre a grade primeiro</option>}
             </select>
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Título</label>
-            <input
-              value={form.title}
-              onChange={e => setForm({ ...form, title: e.target.value })}
-              placeholder="Ex: Lista de exercícios 3"
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none"
-              style={inputStyle}
-              required
-            />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Titulo</label>
+            <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} className="input" required />
           </div>
-          <div className="col-span-2">
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Descrição (opcional)</label>
+          <div className="md:col-span-2">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Descricao em markdown</label>
+              <button type="button" onClick={() => setPreviewOpen((value) => !value)} className="text-sm font-semibold text-[var(--accent)]">
+                {previewOpen ? 'Ocultar preview' : 'Mostrar preview'}
+              </button>
+            </div>
             <textarea
               value={form.description}
-              onChange={e => setForm({ ...form, description: e.target.value })}
-              placeholder="Detalhes sobre a tarefa..."
-              rows={2}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none"
-              style={inputStyle}
+              onChange={(event) => setForm({ ...form, description: event.target.value })}
+              className="input min-h-36 resize-y font-mono text-sm"
+              placeholder={'# Exemplo\n- item 1\n- item 2\n\n**Importante**: levar leitura pronta.'}
             />
           </div>
           <div>
-            <label className="text-xs mb-1 block font-medium" style={labelStyle}>Prazo</label>
-            <input
-              type="datetime-local"
-              value={form.deadline}
-              onChange={e => setForm({ ...form, deadline: e.target.value })}
-              className="w-full rounded-lg px-3 py-2 text-sm outline-none"
-              style={inputStyle}
-              required
-            />
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Prazo</label>
+            <input type="datetime-local" value={form.deadline} onChange={(event) => setForm({ ...form, deadline: event.target.value })} className="input" required />
           </div>
         </div>
-        <button
-          type="submit"
-          disabled={loading || subjects.length === 0}
-          className="py-2 px-5 rounded-lg text-sm font-semibold text-white transition-all disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}
-        >
-          {loading ? 'Salvando...' : 'Adicionar tarefa'}
+
+        {previewOpen && (
+          <div className="rounded-[1rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Preview</p>
+            <MarkdownPreview content={previewContent} className="markdown-body text-sm leading-7 text-[var(--text-2)]" />
+          </div>
+        )}
+
+        {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
+
+        <button type="submit" disabled={loading || subjects.length === 0} className="button-primary px-5 py-3 text-sm disabled:opacity-60">
+          {loading ? 'Salvando...' : submitLabel}
         </button>
       </form>
 
-      <div>
-        <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>Tarefas cadastradas</h2>
-        {items.length === 0 ? (
-          <p className="text-sm" style={{ color: 'var(--text-3)' }}>Nenhuma tarefa cadastrada.</p>
-        ) : (
-          <ul className="space-y-2">
-            {items.map(hw => (
-              <li key={hw.id} className="rounded-xl border px-4 py-3 flex justify-between items-start" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                <div>
-                  <p className="font-medium text-sm" style={{ color: 'var(--text)' }}>{hw.title}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--accent)' }}>{hw.subject}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>Prazo: {new Date(hw.deadline).toLocaleString('pt-BR')}</p>
+      <section className="panel px-6 py-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Tarefas cadastradas</h2>
+          <p className="text-sm text-[var(--text-3)]">
+            Clique em editar para ajustar o conteudo. {selectedEditingItem ? `Editando agora: ${selectedEditingItem.title}.` : 'A lista ja esta ordenada por prazo.'}
+          </p>
+        </div>
+        <div className="mt-4 space-y-3">
+          {items.length > 0 ? (
+            items.map((item) => (
+              <div key={item.id} className="rounded-[1rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--text)]">{item.title}</p>
+                    <p className="mt-1 text-sm text-[var(--accent)]">{item.subject}</p>
+                    {item.description && (
+                      <p className="mt-2 text-sm text-[var(--text-2)]">
+                        {item.description.slice(0, 140)}
+                        {item.description.length > 140 ? '…' : ''}
+                      </p>
+                    )}
+                    <p className="mt-2 text-sm text-[var(--text-3)]">
+                      {new Date(item.deadline).toLocaleString('pt-BR')}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button onClick={() => startEdit(item)} className="text-sm font-semibold text-[var(--accent)]">
+                      Editar
+                    </button>
+                    <button onClick={() => remove(item.id)} className="text-sm font-semibold text-[var(--danger)]">
+                      Remover
+                    </button>
+                  </div>
                 </div>
-                <button onClick={() => remove(hw.id)} className="text-xs ml-4 shrink-0 transition-all font-medium" style={{ color: 'var(--text-3)' }}
-                  onMouseOver={e => (e.currentTarget.style.color = '#ef4444')}
-                  onMouseOut={e => (e.currentTarget.style.color = 'var(--text-3)')}>
-                  Remover
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-[var(--text-3)]">Nenhuma tarefa cadastrada.</p>
+          )}
+        </div>
+      </section>
     </div>
   )
 }

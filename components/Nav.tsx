@@ -2,19 +2,24 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import BrandMark from './BrandMark'
 import ThemeToggle from './ThemeToggle'
 
 const links = [
-  { href: '/', label: 'Início' },
-  { href: '/schedule', label: 'Horários' },
+  { href: '/', label: 'Inicio' },
+  { href: '/schedule', label: 'Horarios' },
   { href: '/homework', label: 'Tarefas' },
   { href: '/arquivos', label: 'Arquivos' },
+  { href: '/todos', label: 'Checklist' },
   { href: '/news', label: 'Avisos' },
 ]
 
 export default function Nav() {
   const pathname = usePathname()
-  if (pathname === '/enter' || pathname === '/admin/login') return null
+
+  if (pathname === '/enter' || pathname === '/admin/login') {
+    return null
+  }
 
   return (
     <nav
@@ -22,26 +27,24 @@ export default function Nav() {
       style={{
         background: 'var(--nav-bg)',
         borderColor: 'var(--border)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
       }}
     >
-      <div className="max-w-5xl mx-auto px-4 flex items-center gap-1 h-14">
-        <Link href="/" className="flex items-center gap-2.5 mr-5">
-          <img src="https://i.imgur.com/H61msci.png" alt="Logo" className="w-7 h-7 object-contain" />
-          <span className="font-semibold text-sm hidden sm:block" style={{ color: 'var(--text)' }}>
-            Ed. Especial <span style={{ color: 'var(--text-3)' }}>2026</span>
-          </span>
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
+        <Link href="/" className="mr-2 shrink-0">
+          <BrandMark compact />
         </Link>
 
-        <div className="flex items-center gap-0.5">
+        <div className="order-3 flex w-full gap-1 overflow-x-auto pb-1 md:order-2 md:w-auto md:flex-1 md:justify-center md:pb-0">
           {links.map(({ href, label }) => {
             const active = pathname === href
+
             return (
               <Link
                 key={href}
                 href={href}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                className="rounded-full px-3 py-2 text-sm font-medium transition"
                 style={{
                   color: active ? 'var(--accent)' : 'var(--text-2)',
                   background: active ? 'var(--accent-bg)' : 'transparent',
@@ -53,12 +56,12 @@ export default function Nav() {
           })}
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 md:order-3">
           <ThemeToggle />
           <Link
             href="/admin"
-            className="text-xs px-2.5 py-1 rounded-lg transition-all font-medium"
-            style={{ color: 'var(--text-3)', background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+            className="rounded-full border px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition"
+            style={{ color: 'var(--text-2)', background: 'var(--surface)', borderColor: 'var(--border)' }}
           >
             Admin
           </Link>

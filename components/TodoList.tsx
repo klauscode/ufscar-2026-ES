@@ -2,60 +2,86 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import type { TodoItem } from '@/lib/types'
 
-type Todo = { id: string; text: string; done: boolean }
+type Props = {
+  initialTodos: TodoItem[]
+}
 
-export default function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
-  const [todos, setTodos] = useState<Todo[]>(initialTodos)
+export default function TodoList({ initialTodos }: Props) {
+  const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
 
-  async function toggle(todo: Todo) {
+  async function toggle(todo: TodoItem) {
     const { data } = await supabase
-      .from('todos').update({ done: !todo.done }).eq('id', todo.id).select().single()
-    if (data) setTodos((prev) => prev.map((t) => (t.id === data.id ? data : t)))
+      .from('todos')
+      .update({ done: !todo.done })
+      .eq('id', todo.id)
+      .select('*')
+      .single()
+
+    if (data) {
+      setTodos((current) => current.map((item) => (item.id === data.id ? (data as TodoItem) : item)))
+    }
   }
 
-  const done = todos.filter((t) => t.done)
-  const pending = todos.filter((t) => !t.done)
+  const pending = todos.filter((todo) => !todo.done)
+  const completed = todos.filter((todo) => todo.done)
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        {pending.length === 0 && done.length === 0 && (
-          <p className="text-gray-400 text-sm">Nenhum item na lista.</p>
-        )}
-        {pending.map((todo) => (
-          <button
-            key={todo.id}
-            onClick={() => toggle(todo)}
-            className="w-full bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center gap-4 text-left hover:border-indigo-200 transition group"
-          >
-            <span className="w-5 h-5 rounded-full border-2 border-gray-300 group-hover:border-indigo-400 flex items-center justify-center shrink-0 transition" />
-            <span className="text-gray-800 text-sm font-medium">{todo.text}</span>
-          </button>
-        ))}
-      </div>
-
-      {done.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Concluídos</p>
-          <div className="space-y-2">
-            {done.map((todo) => (
+    <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+      <section className="panel px-6 py-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-xl font-semibold text-[var(--text)]">Pendentes</h2>
+            <p className="text-sm text-[var(--text-3)]">{pending.length} item(ns) em aberto</p>
+          </div>
+        </div>
+        <div className="mt-4 space-y-3">
+          {pending.length > 0 ? (
+            pending.map((todo) => (
               <button
                 key={todo.id}
                 onClick={() => toggle(todo)}
-                className="w-full bg-white rounded-xl border border-gray-100 px-5 py-4 flex items-center gap-4 text-left opacity-50 hover:opacity-70 transition"
+                className="flex w-full items-center gap-3 rounded-[1rem] border px-4 py-4 text-left"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}
               >
-                <span className="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center shrink-0">
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                <span className="inline-flex h-5 w-5 shrink-0 rounded-full border-2" style={{ borderColor: 'var(--accent)' }} />
+                <span className="text-sm font-medium text-[var(--text)]">{todo.text}</span>
+              </button>
+            ))
+          ) : (
+            <p className="text-sm text-[var(--text-3)]">Nenhum item pendente.</p>
+          )}
+        </div>
+      </section>
+
+      <section className="panel px-6 py-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Concluidos</h2>
+          <p className="text-sm text-[var(--text-3)]">Marque novamente se algo voltar a ser pendente.</p>
+        </div>
+        <div className="mt-4 space-y-3">
+          {completed.length > 0 ? (
+            completed.map((todo) => (
+              <button
+                key={todo.id}
+                onClick={() => toggle(todo)}
+                className="flex w-full items-center gap-3 rounded-[1rem] border px-4 py-4 text-left opacity-70"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}
+              >
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--accent)' }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
-                <span className="text-sm text-gray-500 line-through">{todo.text}</span>
+                <span className="text-sm text-[var(--text-3)] line-through">{todo.text}</span>
               </button>
-            ))}
-          </div>
+            ))
+          ) : (
+            <p className="text-sm text-[var(--text-3)]">Nada concluido ainda.</p>
+          )}
         </div>
-      )}
+      </section>
     </div>
   )
 }

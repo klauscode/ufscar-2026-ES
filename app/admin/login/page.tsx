@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import BrandMark from '@/components/BrandMark'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
@@ -10,54 +11,64 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
     setLoading(true)
     setError('')
 
-    const res = await fetch('/api/admin/login', {
+    const response = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
 
-    if (res.ok) {
+    if (response.ok) {
       router.push('/admin')
-    } else {
-      const body = await res.json().catch(() => ({}))
-      setError(body.error || `Erro ${res.status} — tente novamente.`)
-      setLoading(false)
+      router.refresh()
+      return
     }
+
+    const body = await response.json().catch(() => ({}))
+    setError(body.error || 'Nao foi possivel entrar.')
+    setLoading(false)
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-2xl shadow-md p-10 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">Admin</h1>
-        <p className="text-center text-gray-500 text-sm mb-8">Acesso restrito</p>
+    <main className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md rounded-[2rem] border px-6 py-8 shadow-[var(--shadow-lg)]" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <BrandMark />
+        <div className="mt-8">
+          <p className="font-display text-xs uppercase tracking-[0.34em] text-[var(--text-3)]">
+            Admin
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold text-[var(--text)]">Acesso restrito</h1>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-2)]">
+            Use a conta criada no Supabase para publicar avisos e atualizar o painel.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <input
             type="email"
             placeholder="E-mail"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(event) => setEmail(event.target.value)}
+            className="input"
             required
           />
           <input
             type="password"
             placeholder="Senha"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(event) => setPassword(event.target.value)}
+            className="input"
             required
           />
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition disabled:opacity-60"
+            className="button-primary w-full px-5 py-3 text-sm disabled:opacity-60"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

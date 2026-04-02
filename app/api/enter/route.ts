@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   res.cookies.set('class_access', 'granted', {
     httpOnly: true,
     sameSite: 'lax',
-    // Cookie lasts 30 days — coursemates don't retype every visit
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 30,
     path: '/',
   })

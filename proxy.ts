@@ -2,15 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_PATHS = ['/enter', '/api/enter', '/admin/login', '/api/admin/login', '/favicon.ico', '/_next']
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Allow public paths through
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next()
   }
 
-  // Admin pages: need admin session
   if (pathname.startsWith('/admin')) {
     const adminSession = req.cookies.get('admin_session')
     if (!adminSession) {
@@ -19,7 +17,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Admin API routes: need admin session cookie
   if (pathname.startsWith('/api/admin/')) {
     const adminSession = req.cookies.get('admin_session')
     if (!adminSession) {
@@ -28,7 +25,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // All other routes: need class password cookie
   const classAccess = req.cookies.get('class_access')
   if (!classAccess || classAccess.value !== 'granted') {
     return NextResponse.redirect(new URL('/enter', req.url))

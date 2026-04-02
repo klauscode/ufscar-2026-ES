@@ -1,88 +1,140 @@
 'use client'
 
 import { useState } from 'react'
+import type { NewsItem } from '@/lib/types'
 
-export default function AdminNews({ initial }: { initial: any[] }) {
+type Props = {
+  initial: NewsItem[]
+}
+
+type FormState = {
+  title: string
+  body: string
+  pinned: boolean
+}
+
+export default function AdminNews({ initial }: Props) {
   const [items, setItems] = useState(initial)
-  const [form, setForm] = useState({ title: '', body: '', pinned: false })
+  const [form, setForm] = useState<FormState>({ title: '', body: '', pinned: false })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault()
+  async function add(event: React.FormEvent) {
+    event.preventDefault()
     setLoading(true)
-    const res = await fetch('/api/admin/news', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-    if (res.ok) { setForm({ title: '', body: '', pinned: false }); window.location.reload() }
+    setError('')
+
+    const response = await fetch('/api/admin/news', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+
+    const body = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      setError(body.error || 'Nao foi possivel publicar o aviso.')
+      setLoading(false)
+      return
+    }
+
+    setItems((current) => [body.item as NewsItem, ...current])
+    setForm({ title: '', body: '', pinned: false })
     setLoading(false)
   }
 
-  async function togglePin(item: any) {
-    await fetch('/api/admin/news', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: item.id, pinned: !item.pinned }) })
-    setItems(prev => prev.map(n => n.id === item.id ? { ...n, pinned: !n.pinned } : n))
+  async function togglePin(item: NewsItem) {
+    const response = await fetch('/api/admin/news', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: item.id, pinned: !item.pinned }),
+    })
+
+    const body = await response.json().catch(() => ({}))
+    if (response.ok) {
+      setItems((current) => current.map((entry) => (entry.id === item.id ? (body.item as NewsItem) : entry)))
+    }
   }
 
   async function remove(id: string) {
-    await fetch('/api/admin/news', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
-    setItems(prev => prev.filter(n => n.id !== id))
+    const response = await fetch('/api/admin/news', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+
+    if (response.ok) {
+      setItems((current) => current.filter((item) => item.id !== id))
+    }
   }
 
-  const inputStyle = { background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text)' }
-
   return (
-    <div className="space-y-6">
-      <form onSubmit={add} className="rounded-2xl border p-6 space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-        <h2 className="font-semibold" style={{ color: 'var(--text)' }}>Publicar aviso</h2>
+    <div className="grid gap-5 lg:grid-cols-[1fr_1.1fr]">
+      <form onSubmit={add} className="panel space-y-4 px-6 py-6">
         <div>
-          <label className="text-xs mb-1 block font-medium" style={{ color: 'var(--text-2)' }}>Título</label>
-          <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-            placeholder="Ex: Aula cancelada na quinta"
-            className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={inputStyle} required />
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Publicar aviso</h2>
+          <p className="text-sm text-[var(--text-3)]">Use avisos fixados para o que realmente precisa destaque.</p>
         </div>
+
         <div>
-          <label className="text-xs mb-1 block font-medium" style={{ color: 'var(--text-2)' }}>Mensagem</label>
-          <textarea value={form.body} onChange={e => setForm({ ...form, body: e.target.value })}
-            placeholder="Escreva o aviso aqui..."
-            rows={3} className="w-full rounded-lg px-3 py-2 text-sm outline-none resize-none" style={inputStyle} required />
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Titulo</label>
+          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} className="input" required />
         </div>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={form.pinned} onChange={e => setForm({ ...form, pinned: e.target.checked })} className="rounded" />
-          <span className="text-sm" style={{ color: 'var(--text-2)' }}>Fixar no topo</span>
+
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-3)]">Mensagem</label>
+          <textarea value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} className="input min-h-32 resize-y" required />
+        </div>
+
+        <label className="flex items-center gap-3 text-sm text-[var(--text-2)]">
+          <input type="checkbox" checked={form.pinned} onChange={(event) => setForm({ ...form, pinned: event.target.checked })} />
+          Fixar no topo
         </label>
-        <button type="submit" disabled={loading}
-          className="py-2 px-5 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
-          style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>
+
+        {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
+
+        <button type="submit" disabled={loading} className="button-primary px-5 py-3 text-sm disabled:opacity-60">
           {loading ? 'Publicando...' : 'Publicar aviso'}
         </button>
       </form>
 
-      <div>
-        <h2 className="font-semibold mb-3" style={{ color: 'var(--text)' }}>Avisos publicados</h2>
-        {items.length === 0 ? <p className="text-sm" style={{ color: 'var(--text-3)' }}>Nenhum aviso.</p> : (
-          <ul className="space-y-2">
-            {items.map(n => (
-              <li key={n.id} className="rounded-xl border px-4 py-3" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm" style={{ color: 'var(--text)' }}>{n.title}</p>
-                    <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-3)' }}>{n.body}</p>
+      <section className="panel px-6 py-6">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-[var(--text)]">Avisos publicados</h2>
+          <p className="text-sm text-[var(--text-3)]">Revise o que esta visivel para a turma.</p>
+        </div>
+        <div className="mt-4 space-y-3">
+          {items.length > 0 ? (
+            items.map((item) => (
+              <div key={item.id} className="rounded-[1rem] border px-4 py-4" style={{ borderColor: 'var(--border)', background: 'var(--surface-solid)' }}>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-[var(--text)]">{item.title}</p>
+                      {item.pinned && (
+                        <span className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]" style={{ background: 'rgba(169,77,30,0.14)', color: 'var(--warn)' }}>
+                          Fixado
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-sm text-[var(--text-2)]">{item.body}</p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button onClick={() => togglePin(n)}
-                      className="text-xs px-2 py-1 rounded-full font-medium transition-all"
-                      style={{ background: n.pinned ? 'rgba(245,158,11,0.15)' : 'var(--surface-2)', color: n.pinned ? '#d97706' : 'var(--text-3)' }}>
-                      {n.pinned ? 'Fixado' : 'Fixar'}
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button onClick={() => togglePin(item)} className="text-sm font-semibold text-[var(--accent)]">
+                      {item.pinned ? 'Desfixar' : 'Fixar'}
                     </button>
-                    <button onClick={() => remove(n.id)} className="text-xs font-medium transition-all" style={{ color: 'var(--text-3)' }}
-                      onMouseOver={e => (e.currentTarget.style.color = '#ef4444')}
-                      onMouseOut={e => (e.currentTarget.style.color = 'var(--text-3)')}>
+                    <button onClick={() => remove(item.id)} className="text-sm font-semibold text-[var(--danger)]">
                       Remover
                     </button>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-[var(--text-3)]">Nenhum aviso publicado.</p>
+          )}
+        </div>
+      </section>
     </div>
   )
 }
